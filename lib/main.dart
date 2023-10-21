@@ -5,12 +5,11 @@ import 'package:my_bookly/Features/home/domain/entities/book_entity.dart';
 import 'package:my_bookly/constants.dart';
 import 'package:my_bookly/core/utils/app_router.dart';
 
-void main() async{
+void main() async {
   runApp(const BooklyApp());
-
+ await Hive.initFlutter();
   Hive.registerAdapter(BookEntityAdapter());
   await Hive.openBox(kFeaturedBox);
-  
 }
 
 class BooklyApp extends StatelessWidget {
