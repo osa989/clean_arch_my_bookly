@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:dio/dio.dart';
 import 'package:my_bookly/Features/home/data/data_sources/home_local_data_dource.dart';
 import 'package:my_bookly/Features/home/data/data_sources/home_remote_data_source.dart';
 import 'package:my_bookly/Features/home/domain/entities/book_entity.dart';
@@ -21,8 +22,13 @@ class HomeRepoImpl extends HomeRepo {
       var books = await homeRemoteDataSource.fetchFeaturedBooks();
       return right(books);
     } catch (e) {
-      return left(Failure());
-    }
+      if (e is DioException) {
+        return left(ServerFailure.fromDioError(e));
+        }
+        else{
+          return left(ServerFailure(e.toString()));
+        }
+      }
   }
 
   @override
@@ -32,10 +38,16 @@ class HomeRepoImpl extends HomeRepo {
       if (books.isNotEmpty) {
         return right(books);
       }
-      var books = await homeRemoteDataSource.fetchNewsetBooks();
+      books = await homeRemoteDataSource.fetchNewsetBooks();
       return right(books);
     } catch (e) {
-      return left(Failure());
+      if (e is DioException) {
+        return left(ServerFailure.fromDioError(e));
+        }
+        else{
+          return left(ServerFailure(e.toString()));
+        }
+      }
     }
   }
-}
+
