@@ -14,12 +14,16 @@ import 'package:my_bookly/Features/home/presentation/manger/newest_books_cubit/n
 import 'package:my_bookly/constants.dart';
 import 'package:my_bookly/core/utils/api_service.dart';
 import 'package:my_bookly/core/utils/app_router.dart';
+import 'package:my_bookly/core/utils/functions/setup_service_locator.dart';
+import 'package:my_bookly/core/utils/simple_bloc_observer.dart';
 
 void main() async {
   await Hive.initFlutter();
   Hive.registerAdapter(BookEntityAdapter());
+  setupServiceLocator();
   await Hive.openBox<BookEntity>(kFeaturedBox);
   await Hive.openBox<BookEntity>(kNewestBox);
+  Bloc.observer = SimpleBlocObserver();
   runApp(const BooklyApp());
 }
 
@@ -33,24 +37,14 @@ class BooklyApp extends StatelessWidget {
         BlocProvider(
           create: (context) {
             return FeaturedBooksCubit(
-              FetchFeaturedBooksUseCase(
-                HomeRepoImpl(
-                    homeLoclaDataSource: HomeLocalDataSourceImpl(),
-                    homeRemoteDataSource:
-                        HomeRemoteDataSourceImpl(ApiService(Dio(),),),),
-              ),
+              FetchFeaturedBooksUseCase(getIt.get<HomeRepoImpl>()),
             );
           },
         ),
         BlocProvider(
           create: (context) {
             return NewestBooksCubit(
-              FetchNewsetBooksUseCase(
-                HomeRepoImpl(
-                    homeLoclaDataSource: HomeLocalDataSourceImpl(),
-                    homeRemoteDataSource:
-                        HomeRemoteDataSourceImpl(ApiService(Dio(),),),),
-              ),
+              FetchNewsetBooksUseCase(getIt.get<HomeRepoImpl>()),
             );
           },
         ),
